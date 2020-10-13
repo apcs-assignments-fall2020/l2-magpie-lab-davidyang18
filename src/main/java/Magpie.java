@@ -10,14 +10,12 @@
  * @author Laurie White
  * @version April 2012
  */
-public class Magpie
-{
+public class Magpie {
     /**
      * Get a default greeting   
      * @return a greeting
      */
-    public String getGreeting()
-    {
+    public String getGreeting() {
         return "Hello, let's talk.";
     }
     
@@ -28,22 +26,43 @@ public class Magpie
      *            the user statement
      * @return a response based on the rules given
      */
-    public String getResponse(String statement)
-    {
+    public String getResponse(String statement) {
         String response = "";
-        if (statement.indexOf("no") >= 0)
-        {
-            response = "Why so negative?";
+        statement = statement.trim();
+        if (statement.equals("")) {
+            response = "Say something, please...";
         }
-        else if (statement.indexOf("mother") >= 0
-                || statement.indexOf("father") >= 0
-                || statement.indexOf("sister") >= 0
-                || statement.indexOf("brother") >= 0)
-        {
+        else if (findWord (statement, "no") >= 0) {
+            response = "What about yes?";
+        }
+        else if ((findWord (statement, "mother") >= 0)
+                || (findWord (statement, "father") >= 0)
+                || (findWord (statement, "sister") >= 0)
+                || (findWord (statement, "brother") >= 0)) {
             response = "Tell me more about your family.";
         }
-        else
-        {
+        else if ((findWord (statement, "cat") >= 0) || (findWord (statement, "dog") >= 0)) {
+            response = "Tell me more about your pets.";
+        }
+        else if ((findWord (statement, "Mr") >= 0)) {
+            response = "He sounds like a good teacher.";
+        }
+        else if ((findWord (statement, "Mrs") >= 0)) {
+            response = "She sounds like a good teacher.";
+        }
+        else if (((findWord (statement, "I want") >= 0)) && ((findWord (statement, "to") >= 0))) {
+            response = transformIWantToStatement(statement);
+        }
+        else if (((findWord (statement, "You") >= 0)) && ((findWord (statement, "me") >= 0))) {
+            response = transformYouMeStatement(statement);
+        }
+        else if (((findWord (statement, "I") >= 0)) && ((findWord (statement, "want") >= 0))) {
+            response = transformIWantStatement(statement);
+        }
+        else if (((findWord (statement, "I") >= 0)) && ((findWord (statement, "you") >= 0))) {
+            response = transformIYouStatement(statement);
+        }
+        else {
             response = getRandomResponse();
         }
         return response;
@@ -53,28 +72,29 @@ public class Magpie
      * Pick a default response to use if nothing else fits.
      * @return a non-committal string
      */
-    public String getRandomResponse()
-    {
-        final int NUMBER_OF_RESPONSES = 4;
+    public String getRandomResponse() {
+        final int NUMBER_OF_RESPONSES = 6;
         double r = Math.random();
         int whichResponse = (int)(r * NUMBER_OF_RESPONSES);
         String response = "";
         
-        if (whichResponse == 0)
-        {
+        if (whichResponse == 0) {
             response = "Interesting, tell me more.";
         }
-        else if (whichResponse == 1)
-        {
+        else if (whichResponse == 1) {
             response = "Hmmm.";
         }
-        else if (whichResponse == 2)
-        {
+        else if (whichResponse == 2) {
             response = "Do you really think so?";
         }
-        else if (whichResponse == 3)
-        {
+        else if (whichResponse == 3) {
             response = "You don't say.";
+        }
+        else if (whichResponse == 4) {
+            response = "Hmmm nice weather today, isn't it?";
+        }
+        else if (whichResponse == 5) {
+            response = "Sounds fun!";
         }
     
         return response;
@@ -90,7 +110,9 @@ public class Magpie
     // The method returns the index of the first character in word
     // if it is found, and returns -1 otherwise. 
     public int findWord(String str, String word) {
-        return -1;
+        str = " " + str.toLowerCase() + " ";
+        word = " " + word.toLowerCase() + " ";
+        return str.indexOf(word);
     }
 
     
@@ -102,10 +124,14 @@ public class Magpie
      * @param statement the user statement, assumed to contain "I want"
      * @return the transformed statement
      */
-    public String transformIWantStatement(String statement)
-    {
-        //your code here
-        return "";
+    public String transformIWantStatement(String statement) {
+        statement = statement.trim();
+        String [] input = statement.split(" ");
+        String action = input[input.length - 1];
+        if ((findWord (statement, "I want") >= 0)) {
+            return ("Would you really be happy if you had " + action + "?");
+        }
+        return action;
     }
 
     /**
@@ -114,10 +140,13 @@ public class Magpie
      * @param statement the user statement, assumed to contain "I" followed by "you"
      * @return the transformed statement
      */
-    public String transformIYouStatement(String statement)
-    {
-        //your code here
-        return "";
+    public String transformIYouStatement(String statement) {
+        String [] input = statement.split(" ");
+        String action = input[input.length - 2];
+        if (((findWord (statement, "I") >= 0)) && ((findWord (statement, "you") >= 0))) {
+            return ("Why do you " + action + " me?");
+        }
+        return action;
     }
 
     /**
@@ -126,10 +155,13 @@ public class Magpie
      * @param statement the user statement, assumed to contain "I want to"
      * @return the transformed statement
      */
-    public String transformIWantToStatement(String statement)
-    {
-        // your code here
-        return "";
+    public String transformIWantToStatement(String statement) {
+        String [] input = statement.split(" ");
+        String action = input[input.length - 2] + " " + input[input.length - 1];
+        if (((findWord (statement, "I want") >= 0)) && ((findWord (statement, "to") >= 0))) {
+            return ("What would it mean to " + action + "?");
+        }
+        return action;
     }
 
 
@@ -141,9 +173,12 @@ public class Magpie
      * @param statement the user statement, assumed to contain "you" followed by "me"
      * @return the transformed statement
      */
-    public String transformYouMeStatement(String statement)
-    {
-        // your code here
-        return "";
+    public String transformYouMeStatement(String statement) {
+        String [] input = statement.split(" ");
+        String action = input[input.length - 2];
+        if (((findWord (statement, "you") >= 0)) && ((findWord (statement, "me") >= 0))) {
+            return ("What makes you think that I " + action + " you?");
+        }
+        return action;
     }
 }
